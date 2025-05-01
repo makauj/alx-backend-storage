@@ -1,10 +1,7 @@
 -- SQL script that creates a stored procedure ComputeAverageWeightedScoreForUsers that computes and store the average weighted score for all students.
 DELIMITER $$
 
-CREATE PROCEDURE ComputeAverageWeightedScoreForUsers(
-    IN course_id INT,
-    IN semester_id INT
-)
+CREATE PROCEDURE ComputeAverageWeightedScoreForUsers()
 BEGIN
     DECLARE student_id, total_projects_weight INT;
     DECLARE average_weight_score, total_projects_weighted_score FLOAT;
