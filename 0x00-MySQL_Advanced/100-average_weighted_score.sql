@@ -2,25 +2,19 @@
 DELIMITER $$
 
 CREATE PROCEDURE ComputeAverageWeightedScoreForUser(
-    userId INT
-
+    IN user_id INT
 )
 BEGIN
-    DECLARE averageWeightedScore FLOAT;
+    DECLARE average_weight_score, total_projects_weighted_score FLOAT;
+    DECLARE total_projects_weight INT;
 
-    -- Calculate the average weighted score for the user
-    SELECT AVG(score * weight) INTO averageWeightedScore
-    FROM (
-        SELECT s.score, c.weight
-        FROM Scores s
-        JOIN Courses c ON s.courseId = c.id
-        WHERE s.userId = userId
-    ) AS weightedScores;
+    SELECT SUM(score * projects.weight) INTO total_projects_weighted_score
+        FROM corrections JOIN projects ON project_id = projects.id
+        WHERE corrections.user_id = user_id GROUP BY corrections.user_id;
 
-    -- Store the result in the UserScores table
-    INSERT INTO UserScores (userId, averageWeightedScore)
-    VALUES (userId, averageWeightedScore)
-    ON DUPLICATE KEY UPDATE averageWeightedScore = averageWeightedScore;
+    SELECT SUM(projects.weight) INTO total_projects_weight FROM projects;
+    SET average_weight_score = total_projects_weighted_score / total_projects_weight;
+    UPDATE users SET average_score = average_weight_score WHERE id = user_id;
 END$$
 
 DELIMITER ;
