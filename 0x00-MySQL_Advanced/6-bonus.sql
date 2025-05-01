@@ -9,27 +9,15 @@ CREATE PROCEDURE Addbonus (
     IN score INT
 )
 BEGIN
-    DECLARE user_exists INT DEFAULT 0;
-    DECLARE project_exists INT DEFAULT 0;
-
-    -- Check if the user exists
-    SELECT COUNT(*) INTO user_exists
-    FROM users
-    WHERE id = user_id;
-
-    -- Check if the project exists
-    SELECT COUNT(*) INTO project_exists
-    FROM projects
-    WHERE name = project_name;
-
-    -- If the user and project exist, insert the bonus
-    IF user_exists > 0 AND project_exists > 0 THEN
-        INSERT INTO bonuses (user_id, project_name, score)
-        VALUES (user_id, project_name, score);
-    ELSE
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'User or project does not exist';
-    END IF;
+    INSERT INTO projects (name)
+    SELECT project_name FROM DUAL
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM projects
+        WHERE name = project_name
+    );
+    INSERT INTO corrections (user_id, project_id, score)
+    SELECT(user_id, (SELECT id FROM projects WHERE name = project_name), score);
 END$$
 
 DELIMITER ;
