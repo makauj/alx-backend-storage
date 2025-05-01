@@ -1,26 +1,17 @@
 -- SQL script that creates a stored procedure ComputeAverageScoreForUser
 --that computes and store the average score for a student.
 --Note: An average score can be a decimal
-DELIMITER $
+DELIMITER $$;
 
-CREATE PROCEDURE ComputeAverageScoreForUser (IN user_id INT)
+CREATE PROCEDURE AddBonus(IN user_id INT, IN project_name VARCHAR(255), IN score INT )
 BEGIN
-    DECLARE average_score DECIMAL(5,2);  -- Declare the local variable to store the average score
+	IF NOT EXISTS(SELECT name FROM projects WHERE name=project_name) THEN
+		INSERT INTO projects (name) VALUES (project_name);
+	END IF;
 
-    -- Calculate the average score for the user
-    SELECT AVG(score) INTO average_score
-    FROM corrections
-    WHERE user_id = user_id;
-
-    -- If no score exists, set average_score to 0
-    IF average_score IS NULL THEN
-        SET average_score = 0;
-    END IF;
-
-    -- Update the user's average_score in the users table
-    UPDATE users
-    SET average_score = average_score
-    WHERE id = user_id;
-END$
+	INSERT INTO corrections (user_id, project_id, score)
+	VALUES (user_id, (SELECT id from projects WHERE name=project_name), score);
+END;$$
 
 DELIMITER ;
+
