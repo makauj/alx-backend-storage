@@ -1,2 +1,2 @@
 // list all documents named ALX in school
-db.school.find({ name: "ALX" })
+db.school.find({"name": "ALX"})
