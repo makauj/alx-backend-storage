@@ -1,4 +1,2 @@
-#!/usr/bin/env bash
-db.adminCommand('listDatabases').databases.forEach(function(db) {
-    print(db.name);
-});
+// lista all databases
+show dbs
